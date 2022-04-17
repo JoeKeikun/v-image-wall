@@ -18,6 +18,9 @@ function calcFitArr(widthArr, wholeWidth, minWidth, maxWidth) {
   // 数组数量
   const len = tArr.length;
 
+  // 改变值计数
+  let changedDelta = 0;
+
   while (delta > 0) {
     // 达到限制的个数
     let limitCount = 0;
@@ -29,6 +32,8 @@ function calcFitArr(widthArr, wholeWidth, minWidth, maxWidth) {
         if (tArr[i] < maxWidth) {
           tArr[i]++;
           delta--;
+
+          changedDelta++;
         }
         // 当前值超过上限
         else {
@@ -41,6 +46,8 @@ function calcFitArr(widthArr, wholeWidth, minWidth, maxWidth) {
         if (tArr[i] > minWidth) {
           tArr[i]--;
           delta--;
+
+          changedDelta++;
         }
         // 当前值超过上限
         else {
@@ -59,6 +66,7 @@ function calcFitArr(widthArr, wholeWidth, minWidth, maxWidth) {
   }
 
   if (delta === 0) {
+    tArr.changedDelta = changedDelta;
     return tArr;
   }
   else {
@@ -198,35 +206,42 @@ export default {
           }
           // 剩余空间不够
           else if (tSpace < 0) {
-            // 已有宽度集合
+            // 已有宽度 集合
             const wArr = tmpArr.map(i => i.width);
-
-            // 当前宽度集合
+            // 已有宽度 + 当前宽度 集合
             let cArr = wArr.concat(placeholderWidth);
-            // 剩余空间
-            let cWWidth = dWidth - imgGap * wArr.length;
 
             // 计算结果
-            let nArr = calcFitArr(cArr, cWWidth, minWidth, maxWidth);
+            let nArr1 = calcFitArr(cArr, dWidth - imgGap * wArr.length, minWidth, maxWidth);
+            let nArr2 = calcFitArr(wArr, dWidth - imgGap * (wArr.length - 1), minWidth, maxWidth);
 
-            // 塞不下时，则去掉该宽度后，重新运算
-            if (nArr.length === 0) {
-              // 剩余空间
-              cWWidth = cWWidth - imgGap;
+            // 有结果，取最小改动
+            if (nArr1.length !== 0 || nArr2.length !== 0) {
+              let dstArr = [];
 
-              nArr = calcFitArr(wArr, cWWidth, minWidth, maxWidth);
-            }
+              if (nArr1.length === 0) {
+                dstArr = nArr2;
+              }
+              else if (nArr2.length === 0) {
+                dstArr = nArr1;
+              }
+              else {
+                if (nArr1.changedDelta < nArr2.changedDelta) {
+                  dstArr = nArr1;
+                }
+                else {
+                  dstArr = nArr2;
+                }
+              }
 
-            // 有结果，重算数据
-            if (nArr.length !== 0) {
-              for (let p = 0, q = nArr.length; p < q; p++) {
+              for (let p = 0, q = dstArr.length; p < q; p++) {
                 const preItem = tmpArr[p - 1];
                 const left = preItem ? (preItem.left + preItem.width + imgGap) : 0;
 
                 tmpArr[p] = {
                   top: top,
                   left: left,
-                  width: nArr[p],
+                  width: dstArr[p],
                   height: imgH,
                   visible: top <= vTop,
                 };
