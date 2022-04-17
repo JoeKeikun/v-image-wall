@@ -77,7 +77,9 @@ export default {
     // 图片高宽 数据
     imageRectData: {
       type: Array,
-      default: []
+      default: () => {
+        return [];
+      }
     },
 
     // 是否嵌入banner
