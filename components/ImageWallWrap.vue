@@ -217,21 +217,11 @@ export default {
 
             // 有结果，取最小改动
             if (nArr1.length !== 0 || nArr2.length !== 0) {
-              let dstArr = [];
+              let dstArr = nArr1;
 
-              if (nArr1.length === 0) {
+              if (nArr1.length === 0 || nArr1.changedDelta > nArr2.changedDelta) {
                 dstArr = nArr2;
-              }
-              else if (nArr2.length === 0) {
-                dstArr = nArr1;
-              }
-              else {
-                if (nArr1.changedDelta < nArr2.changedDelta) {
-                  dstArr = nArr1;
-                }
-                else {
-                  dstArr = nArr2;
-                }
+                i--;
               }
 
               for (let p = 0, q = dstArr.length; p < q; p++) {
