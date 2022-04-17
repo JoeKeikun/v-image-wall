@@ -269,6 +269,11 @@ export default {
         }
       }
 
+      // 移除末尾空行
+      if (!cache[rowIndex]) {
+        rowIndex--;
+      }
+
       res.list = [];
       for (var i = 0; i <= rowIndex; i++) {
         res.list = res.list.concat(cache[i]);
